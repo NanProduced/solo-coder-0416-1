@@ -170,7 +170,11 @@ class PackageManager {
     this.mode = mode;
 
     if (mode === 'local') {
-      await this.selectProjectPath();
+      const pathSelected = await this.selectProjectPath();
+      if (!pathSelected) {
+        // 用户取消了路径输入，返回 null 让主循环重新显示模式选择
+        return null;
+      }
     }
 
     return mode;
@@ -204,13 +208,26 @@ class PackageManager {
       }
     };
 
-    const path = await input({
-      message: '请输入项目路径:',
-      validate: validatePath
-    });
+    while (true) {
+      try {
+        const path = await input({
+          message: '请输入项目路径 (按 Ctrl+C 返回上一级):',
+          validate: validatePath
+        });
 
-    this.projectPath = path.trim();
-    console.log(chalk.green(`已选择项目路径: ${this.projectPath}`));
+        this.projectPath = path.trim();
+        console.log(chalk.green(`已选择项目路径: ${this.projectPath}`));
+        return true;
+      } catch (error) {
+        // 检查是否是用户按了 Ctrl+C
+        if (error.message.includes('User force closed') || error.name === 'ExitPromptError') {
+          console.log(chalk.yellow('\n已取消路径输入，返回上一级菜单'));
+          return false;
+        }
+        // 其他错误，重新提示
+        console.log(chalk.red(`输入错误: ${error.message}，请重新输入`));
+      }
+    }
   }
 
   loadPackages() {
@@ -447,6 +464,11 @@ class PackageManager {
     try {
       while (true) {
         const mode = await this.selectMode();
+        
+        // 如果用户取消了路径输入，重新显示模式选择
+        if (mode === null) {
+          continue;
+        }
         
         if (mode === 'exit') {
           console.log(chalk.blue('\n感谢使用，再见！'));
