@@ -1,0 +1,30 @@
+{
+  "name": "npm-package-manager-tui",
+  "version": "1.0.0",
+  "description": "A TUI tool for managing npm/pnpm packages on Windows",
+  "main": "index.js",
+  "type": "module",
+  "bin": {
+    "npm-tui": "./index.js"
+  },
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": [
+    "npm",
+    "pnpm",
+    "package-manager",
+    "tui",
+    "cli"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@inquirer/prompts": "^6.0.0",
+    "chalk": "^5.3.0",
+    "cli-table3": "^0.6.5"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
